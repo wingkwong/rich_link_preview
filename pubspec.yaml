@@ -1,0 +1,13 @@
+name: rich_link_preview
+description: A Rich Link Preview widget written in Dart
+version: 0.1.0
+homepage: https://github.com/wingkwong/rich_link_preview.git
+author: WONG, Wing Kam <wingkwong.code@gmail.com>
+
+environment:
+  sdk: '>=2.0.0 <3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  open_graph_parser: ^0.0.4
