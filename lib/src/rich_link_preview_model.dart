@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:open_graph_parser/open_graph_parser.dart';
 import './rich_link_preview.dart';
 
-abstract class RichLinkPreviewModel extends State<RichLinkPreview> {
+abstract class RichLinkPreviewModel extends State<RichLinkPreview> with SingleTickerProviderStateMixin{
+  AnimationController controller;
+  Animation<Offset> position;
   String _link;
   Map _ogData;
 
@@ -13,6 +15,14 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview> {
         _ogData = data;
         print(_ogData);
       });
+
+      controller =
+          AnimationController(vsync: this, duration: Duration(milliseconds: 750));
+      position = Tween<Offset>(begin: Offset(0.0, 4.0), end: Offset.zero)
+          .animate(
+          CurvedAnimation(parent: controller, curve: Curves.bounceInOut));
+
+      controller.forward();
     });
   }
 
@@ -34,37 +44,48 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview> {
       );
     } else {
       return (
-          Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Expanded(
-                    flex: 2,
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                          Container(
-                              child: new ClipRRect(
-                                  borderRadius: const BorderRadius.only(
-                                      topLeft: Radius.circular(10.0),
-                                      bottomLeft: Radius.circular(10.0)
-                                  ),
-                                  child: Image.network(
-                                      _ogData['image:secure_url'],
-                                      width: 120.0,
-                                      height: 100.0,
-                                      fit: BoxFit.fill
+          SlideTransition(
+              position: position,
+              child: Container(
+                  height: 100.0,
+                  decoration: new BoxDecoration (
+                      color: Colors.green,
+                      borderRadius: const BorderRadius.all(const Radius.circular(10.0)),
+                      ),
+                  child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Expanded(
+                            flex: 2,
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: <Widget>[
+                                  Container(
+                                      child: new ClipRRect(
+                                          borderRadius: const BorderRadius.only(
+                                              topLeft: Radius.circular(10.0),
+                                              bottomLeft: Radius.circular(10.0)
+                                          ),
+                                          child: Image.network(
+                                              _ogData['image:secure_url'],
+                                              width: 120.0,
+                                              height: 100.0,
+                                              fit: BoxFit.fill
+                                          )
+                                      )
                                   )
-                              )
-                          )
-                        ],
-                    )
-                ),
-                Expanded(
-                    flex: 5,
-                    child: _buildRichLinkPreviewBody(context, _ogData)
-                ),
-              ]
+                                ],
+                                )
+                        ),
+                        Expanded(
+                            flex: 5,
+                            child: _buildRichLinkPreviewBody(context, _ogData)
+                        ),
+                      ]
+                  )
+              )
           )
+
       );
     }
   }
