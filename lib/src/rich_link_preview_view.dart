@@ -8,11 +8,6 @@ class RichLinkPreviewView extends RichLinkPreviewModel {
       child: Column(
         children: [
           Container(
-              height: 100.0,
-              decoration: new BoxDecoration (
-                color: Colors.green,
-                borderRadius: const BorderRadius.all(const Radius.circular(10.0)),
-            ),
             child: buildRichLinkPreview(context)
           )
         ]
