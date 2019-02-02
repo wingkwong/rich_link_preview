@@ -44,10 +44,14 @@ class _RichLinkPreviewExampleState extends State<RichLinkPreviewExample> {
                 children: <Widget>[
                   Expanded(child: Container()),
                   RichLinkPreview(
-                    link: _link
+                    link: _link,
+                      borderColor: Color(0xFFE0E0E0),
+                      backgroundColor: Color(0xFFE0E0E0)
                   ),
                   TextField(
-                    decoration: InputDecoration(labelText: 'Enter text'),
+                    decoration: InputDecoration(
+                        border: new OutlineInputBorder(
+                        borderSide: new BorderSide(color: Colors.teal)),),
                     controller: _textController,
                       onChanged: (String val) => _onTextChange(val),
                   )
