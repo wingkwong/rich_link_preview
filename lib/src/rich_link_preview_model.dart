@@ -11,6 +11,7 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
   double _height;
   Color _borderColor;
   Color _backgroundColor;
+  bool _appendToLink;
   Map _ogData;
 
   void getOGData() async {
@@ -41,7 +42,9 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
     _height = widget.height ?? 100.0;
     _borderColor = widget.borderColor ?? Color(0xFFE0E0E0);
     _backgroundColor = widget.backgroundColor ?? Color(0xFFE0E0E0);
+    _appendToLink = widget.appendToLink ?? false;
 
+    fetchData();
     super.initState();
   }
 
@@ -66,6 +69,10 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
       _link = oldWidget.link != widget.link ? widget.link : '';
     });
 
+    fetchData();
+  }
+
+  void fetchData() {
     if (isValidUrl(_link) == true) {
       getOGData();
     } else {
@@ -79,17 +86,21 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
     if (_ogData == null) {
       return Container(width: 0, height: 0);
     } else {
-      return (SlideTransition(
-          position: position,
-          child: Container(
-              //margin: const EdgeInsets.only(bottom: 2.0),
-              height: _height,
-              decoration: new BoxDecoration(
+      if(_appendToLink == true) {
+        return _buildPreviewRow(context);
+      } else {
+        return (SlideTransition(
+            position: position,
+            child: Container(
+            //margin: const EdgeInsets.only(bottom: 2.0),
+                height: _height,
+                decoration: new BoxDecoration(
                 //border: new Border.all(color: Colors.blueAccent)
-                borderRadius:
+                    borderRadius:
                     const BorderRadius.all(const Radius.circular(2.0)),
-              ),
-              child: _buildPreviewRow(context))));
+                    ),
+                child: _buildPreviewRow(context))));
+      }
     }
   }
 
@@ -112,34 +123,42 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
             children: <Widget>[
               _buildTitle(context),
               _buildDescription(context),
-              _buildUrl(context)
             ]));
   }
 
   Widget _buildPreviewRow(BuildContext context) {
     if (_ogData != null && _ogData['image'] != null) {
-      return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Container(
-                        child: new ClipRRect(
-                            borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(3.0),
-                                bottomRight: Radius.circular(3.0)),
-                            child: Image.network(_ogData['image'],
-                                width: 120.0,
-                                height: _height,
-                                fit: BoxFit.fill)))
-                  ],
-                )),
-            Expanded(
-                flex: 5, child: _buildRichLinkPreviewBody(context, _ogData)),
-          ]);
+      return Column(children: <Widget>[
+        Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Expanded(
+                  flex: 2,
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        Container(
+                            child: new ClipRRect(
+                                borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(3.0),
+                                    bottomRight: Radius.circular(3.0)),
+                                child: Image.network(_ogData['image'],
+                                    width: 120.0,
+                                    height: _height,
+                                    fit: BoxFit.fill)))
+                      ],
+                      )),
+              Expanded(
+                  flex: 5, child: _buildRichLinkPreviewBody(context, _ogData)),
+            ]),
+        Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Expanded(
+                  flex: 8, child: _buildUrl(context)),
+            ]
+        )
+      ],);
     } else {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,7 +172,8 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
       return Padding(
           padding: EdgeInsets.all(1.0),
           child: new Text(_ogData['title'],
-              style: TextStyle(fontWeight: FontWeight.bold)));
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontWeight: FontWeight.bold), ));
     } else {
       return Container(width: 0, height: 0);
     }
@@ -174,14 +194,19 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
   }
 
   Widget _buildUrl(BuildContext context) {
-    if (_ogData != null && _ogData['url'] != null) {
-      return Padding(
-          padding: EdgeInsets.all(2.0),
-          child: new Text(
-            _ogData['url'],
-            overflow: TextOverflow.ellipsis,
-            maxLines: 2,
-          ));
+    if (_link != '') {
+      return Container(
+          decoration: BoxDecoration(
+          color: _backgroundColor,
+      ), child: Padding(
+          padding: EdgeInsets.all(5.0),
+          child:new Text(
+              _link,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
+              )
+      )
+      );
     } else {
       return Container(width: 0, height: 0);
     }

@@ -6,13 +6,15 @@ class RichLinkPreview extends StatefulWidget {
       this.link,
       this.height,
       this.borderColor,
-      this.backgroundColor
+      this.backgroundColor,
+      this.appendToLink,
   });
 
   final String link;
   final double height;
   final Color borderColor;
   final Color backgroundColor;
+  final bool appendToLink;
 
   @override
   RichLinkPreviewView createState() => RichLinkPreviewView();
