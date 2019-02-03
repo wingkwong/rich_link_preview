@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:open_graph_parser/open_graph_parser.dart';
+import 'package:url_launcher/url_launcher.dart';
 import './rich_link_preview.dart';
 
 abstract class RichLinkPreviewModel extends State<RichLinkPreview>
@@ -19,7 +20,6 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
     if (data != null) {
       setState(() {
         _ogData = data;
-        print(_ogData);
       });
 
       controller = AnimationController(
@@ -44,7 +44,7 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
     _backgroundColor = widget.backgroundColor ?? Color(0xFFE0E0E0);
     _appendToLink = widget.appendToLink ?? false;
 
-    fetchData();
+    _fetchData();
     super.initState();
   }
 
@@ -69,16 +69,24 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
       _link = oldWidget.link != widget.link ? widget.link : '';
     });
 
-    fetchData();
+    _fetchData();
   }
 
-  void fetchData() {
+  void _fetchData() {
     if (isValidUrl(_link) == true) {
       getOGData();
     } else {
       setState(() {
         _ogData = null;
       });
+    }
+  }
+
+  void _launchURL(url) async{
+    if (await canLaunch(url)) {
+    await launch(url);
+    } else {
+    throw 'Could not launch $url';
     }
   }
 
@@ -92,10 +100,8 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
         return (SlideTransition(
             position: position,
             child: Container(
-            //margin: const EdgeInsets.only(bottom: 2.0),
                 height: _height,
                 decoration: new BoxDecoration(
-                //border: new Border.all(color: Colors.blueAccent)
                     borderRadius:
                     const BorderRadius.all(const Radius.circular(2.0)),
                     ),
@@ -140,8 +146,7 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
                         Container(
                             child: new ClipRRect(
                                 borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(3.0),
-                                    bottomRight: Radius.circular(3.0)),
+                                    topLeft: Radius.circular(3.0),),
                                 child: Image.network(_ogData['image'],
                                     width: 120.0,
                                     height: _height,
@@ -194,17 +199,20 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
   }
 
   Widget _buildUrl(BuildContext context) {
-    if (_link != '') {
+    if (_link != '' && _appendToLink == true) {
       return Container(
           decoration: BoxDecoration(
           color: _backgroundColor,
       ), child: Padding(
           padding: EdgeInsets.all(5.0),
-          child:new Text(
-              _link,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 2,
-              )
+          child: InkWell (
+              child: Text(
+                  _link,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                  ),
+          onTap: () => _launchURL(_link)
+          )
       )
       );
     } else {
