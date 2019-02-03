@@ -42,7 +42,10 @@ class _RichLinkPreviewExampleState extends State<RichLinkPreviewExample> {
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 children: <Widget>[
-                  Expanded(child: Container()),
+                  Expanded(child: RichLinkPreview(
+                      link: 'https://ourland.hk/detail/72e1aeaf-360b-4f45-a528-ef1c5e4d803c',
+                      appendToLink: true,
+                 )),
                   RichLinkPreview(
                     link: _link,
                       borderColor: Color(0xFFE0E0E0),
