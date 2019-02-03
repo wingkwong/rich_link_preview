@@ -35,10 +35,6 @@ RichLinkPreview(
 ````
 ![image](https://user-images.githubusercontent.com/35857179/52174604-59d09200-27d1-11e9-853f-a9b07b372573.png)
 
-
-## Features
-
-
 ## Parameters
 |Parameter|Type|Description|Example|Required?|Default|
 |--|--|--|--|--|--|
