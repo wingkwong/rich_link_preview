@@ -10,5 +10,5 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  open_graph_parser:
-  url_launcher:
+  open_graph_parser: ^0.0.4
+  url_launcher: ^5.0.0
