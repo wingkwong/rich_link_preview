@@ -3,11 +3,11 @@ import './rich_link_preview_view.dart';
 
 class RichLinkPreview extends StatefulWidget {
   RichLinkPreview({
-      this.link,
-      this.height,
-      this.borderColor,
-      this.backgroundColor,
-      this.appendToLink,
+    this.link,
+    this.height,
+    this.borderColor,
+    this.backgroundColor,
+    this.appendToLink,
   });
 
   final String link;
@@ -18,5 +18,4 @@ class RichLinkPreview extends StatefulWidget {
 
   @override
   RichLinkPreviewView createState() => RichLinkPreviewView();
-
 }

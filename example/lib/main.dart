@@ -42,21 +42,23 @@ class _RichLinkPreviewExampleState extends State<RichLinkPreviewExample> {
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 children: <Widget>[
-                  Expanded(child: RichLinkPreview(
-                      link: 'https://ourland.hk/detail/72e1aeaf-360b-4f45-a528-ef1c5e4d803c',
-                      appendToLink: true,
-                 )),
+                  Expanded(
+                      child: RichLinkPreview(
+                    link:
+                        'https://ourland.hk/detail/72e1aeaf-360b-4f45-a528-ef1c5e4d803c',
+                    appendToLink: true,
+                  )),
                   RichLinkPreview(
-                    link: _link,
+                      link: _link,
                       borderColor: Color(0xFFE0E0E0),
-                      backgroundColor: Color(0xFFE0E0E0)
-                  ),
+                      backgroundColor: Color(0xFFE0E0E0)),
                   TextField(
                     decoration: InputDecoration(
-                        border: new OutlineInputBorder(
-                        borderSide: new BorderSide(color: Colors.teal)),),
+                      border: new OutlineInputBorder(
+                          borderSide: new BorderSide(color: Colors.teal)),
+                    ),
                     controller: _textController,
-                      onChanged: (String val) => _onTextChange(val),
+                    onChanged: (String val) => _onTextChange(val),
                   )
                 ],
               )),
