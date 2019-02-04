@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:open_graph_parser/open_graph_parser.dart';
 import 'package:url_launcher/url_launcher.dart';
 import './rich_link_preview.dart';
@@ -12,6 +11,7 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
   double _height;
   Color _borderColor;
   Color _backgroundColor;
+  Color _textColor;
   bool _appendToLink;
   Map _ogData;
 
@@ -41,6 +41,7 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
     _link = widget.link ?? '';
     _height = widget.height ?? 100.0;
     _borderColor = widget.borderColor ?? Color(0xFFE0E0E0);
+    _textColor = widget.textColor ?? Color(0xFF000000);
     _backgroundColor = widget.backgroundColor ?? Color(0xFFE0E0E0);
     _appendToLink = widget.appendToLink ?? false;
 
@@ -68,7 +69,6 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
     setState(() {
       _link = oldWidget.link != widget.link ? widget.link : '';
     });
-
     _fetchData();
   }
 
@@ -92,7 +92,11 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
 
   Widget buildRichLinkPreview(BuildContext context) {
     if (_ogData == null) {
-      return Container(width: 0, height: 0);
+      return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Expanded(flex: 8, child: _buildUrl(context)),
+          ]);
     } else {
       if (_appendToLink == true) {
         return _buildPreviewRow(context);
@@ -133,7 +137,7 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
   }
 
   Widget _buildPreviewRow(BuildContext context) {
-    if (_ogData != null && _ogData['image'] != null) {
+    if (_ogData['image'] != null) {
       return Column(
         children: <Widget>[
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
@@ -176,7 +180,7 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
           child: new Text(
             _ogData['title'],
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(fontWeight: FontWeight.bold, color: _textColor),
           ));
     } else {
       return Container(width: 0, height: 0);
@@ -187,11 +191,10 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
     if (_ogData != null && _ogData['description'] != null) {
       return Padding(
           padding: EdgeInsets.all(2.0),
-          child: new Text(
-            _ogData['description'],
-            overflow: TextOverflow.ellipsis,
-            maxLines: 3,
-          ));
+          child: new Text(_ogData['description'],
+              overflow: TextOverflow.ellipsis,
+              maxLines: 3,
+              style: TextStyle(color: _textColor)));
     } else {
       return Container(width: 0, height: 0);
     }
@@ -206,11 +209,10 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
           child: Padding(
               padding: EdgeInsets.all(5.0),
               child: InkWell(
-                  child: Text(
-                    _link,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
-                  ),
+                  child: Text(_link,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      style: TextStyle(color: _textColor)),
                   onTap: () => _launchURL(_link))));
     } else {
       return Container(width: 0, height: 0);
