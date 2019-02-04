@@ -42,4 +42,5 @@ RichLinkPreview(
 |height|double|Height of the Rich Link Preview container|150.0|N|100.0|
 |borderColor|Color|Color of the container border|Color(0xFF000000)|N|Color(0xFFE0E0E0)|
 |backgroundColor|Color|Color of the container background|Color(0xFF000000)|N|Color(0xFFE0E0E0)|
+|textColor|Color|Color of the text|Color(0xFFE0E0E0)|N|Color(0xFF000000)|
 |appendToLink|bool|append the preview to link|false|N|false|
