@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:open_graph_parser/open_graph_parser.dart';
 import 'package:url_launcher/url_launcher.dart';
 import './rich_link_preview.dart';
@@ -70,7 +69,6 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
     setState(() {
       _link = oldWidget.link != widget.link ? widget.link : '';
     });
-
     _fetchData();
   }
 
@@ -94,7 +92,11 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
 
   Widget buildRichLinkPreview(BuildContext context) {
     if (_ogData == null) {
-      return Container(width: 0, height: 0);
+      return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Expanded(flex: 8, child: _buildUrl(context)),
+          ]);
     } else {
       if (_appendToLink == true) {
         return _buildPreviewRow(context);
@@ -135,7 +137,7 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
   }
 
   Widget _buildPreviewRow(BuildContext context) {
-    if (_ogData != null && _ogData['image'] != null) {
+    if (_ogData['image'] != null) {
       return Column(
         children: <Widget>[
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
