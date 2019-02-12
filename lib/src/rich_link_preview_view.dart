@@ -6,6 +6,6 @@ class RichLinkPreviewView extends RichLinkPreviewModel {
   Widget build(BuildContext context) {
     return Container(
         child: Column(
-            children: [Container(child: buildRichLinkPreview(context))]));
+            children: [Container(child: buildRichLinkPreviewWidget(context))]));
   }
 }
