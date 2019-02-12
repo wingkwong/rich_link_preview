@@ -13,22 +13,34 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
   Color _backgroundColor;
   Color _textColor;
   bool _appendToLink;
+  bool _isLink;
   Map _ogData;
+  Widget _richLinkPreview;
+
+  Widget buildRichLinkPreviewWidget(BuildContext context) {
+    if(_richLinkPreview == null) {
+      _richLinkPreview = buildRichLinkPreview(context);
+    }
+
+    return _richLinkPreview;
+  }
 
   void getOGData() async {
     Map data = await OpenGraphParser.getOpenGraphData(_link);
     if (data != null) {
-      setState(() {
-        _ogData = data;
-      });
+      if (this.mounted) {
+        setState(() {
+          _ogData = data;
+        });
 
-      controller = AnimationController(
-          vsync: this, duration: Duration(milliseconds: 750));
-      position = Tween<Offset>(begin: Offset(0.0, 4.0), end: Offset.zero)
-          .animate(
-              CurvedAnimation(parent: controller, curve: Curves.bounceInOut));
+        controller = AnimationController(
+            vsync: this, duration: Duration(milliseconds: 750));
+        position = Tween<Offset>(begin: Offset(0.0, 4.0), end: Offset.zero)
+            .animate(
+            CurvedAnimation(parent: controller, curve: Curves.bounceInOut));
 
-      controller.forward();
+        controller.forward();
+      }
     } else {
       setState(() {
         _ogData = null;
@@ -49,6 +61,11 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
     super.initState();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   bool isValidUrl(link) {
     String regexSource =
         "^(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
@@ -65,20 +82,25 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
   @override
   void didUpdateWidget(RichLinkPreview oldWidget) {
     super.didUpdateWidget(oldWidget);
-
-    setState(() {
-      _link = oldWidget.link != widget.link ? widget.link : '';
-    });
+    if(this.mounted) {
+      setState(() {
+        _link = oldWidget.link != widget.link ? widget.link : '';
+      });
+    }
     _fetchData();
   }
 
   void _fetchData() {
     if (isValidUrl(_link) == true) {
       getOGData();
+      _isLink = true;
     } else {
-      setState(() {
-        _ogData = null;
-      });
+      if(this.mounted) {
+        setState(() {
+          _ogData = null;
+        });
+      }
+      _isLink = false;
     }
   }
 
@@ -106,9 +128,9 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
             child: Container(
                 height: _height,
                 decoration: new BoxDecoration(
-                  borderRadius:
-                      const BorderRadius.all(const Radius.circular(2.0)),
-                ),
+                    borderRadius:
+                    const BorderRadius.all(const Radius.circular(2.0)),
+                    ),
                 child: _buildPreviewRow(context))));
       }
     }
@@ -119,14 +141,14 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
         padding: const EdgeInsets.all(3.0),
         height: _height,
         decoration: BoxDecoration(
-          color: _backgroundColor,
-          border: Border(
-            top: BorderSide(width: 2.0, color: _borderColor),
-            left: BorderSide(width: 0.0, color: _borderColor),
-            right: BorderSide(width: 2.0, color: _borderColor),
-            bottom: BorderSide(width: 2.0, color: _borderColor),
-          ),
-        ),
+            color: _backgroundColor,
+            border: Border(
+                top: BorderSide(width: 2.0, color: _borderColor),
+                left: BorderSide(width: 0.0, color: _borderColor),
+                right: BorderSide(width: 2.0, color: _borderColor),
+                bottom: BorderSide(width: 2.0, color: _borderColor),
+                ),
+            ),
         child: new Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
@@ -139,37 +161,37 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
   Widget _buildPreviewRow(BuildContext context) {
     if (_ogData['image'] != null) {
       return Column(
-        children: <Widget>[
-          Row(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-            Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Container(
-                        child: new ClipRRect(
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(3.0),
-                            ),
-                            child: Image.network(_ogData['image'],
-                                width: 120.0,
-                                height: _height,
-                                fit: BoxFit.fill)))
-                  ],
-                )),
-            Expanded(
-                flex: 5, child: _buildRichLinkPreviewBody(context, _ogData)),
-          ]),
-          Row(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-            Expanded(flex: 8, child: _buildUrl(context)),
-          ])
-        ],
-      );
+          children: <Widget>[
+            Row(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+              Expanded(
+                  flex: 2,
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        Container(
+                            child: new ClipRRect(
+                                borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(3.0),
+                                    ),
+                                child: Image.network(_ogData['image'],
+                                    width: 120.0,
+                                    height: _height,
+                                    fit: BoxFit.fill)))
+                      ],
+                      )),
+              Expanded(
+                  flex: 5, child: _buildRichLinkPreviewBody(context, _ogData)),
+            ]),
+            Row(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+              Expanded(flex: 8, child: _buildUrl(context)),
+            ])
+          ],
+          );
     } else {
       return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[_buildRichLinkPreviewBody(context, _ogData)],
-      );
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[_buildRichLinkPreviewBody(context, _ogData)],
+          );
     }
   }
 
@@ -178,10 +200,10 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
       return Padding(
           padding: EdgeInsets.all(1.0),
           child: new Text(
-            _ogData['title'],
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontWeight: FontWeight.bold, color: _textColor),
-          ));
+              _ogData['title'],
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontWeight: FontWeight.bold, color: _textColor),
+              ));
     } else {
       return Container(width: 0, height: 0);
     }
@@ -204,16 +226,21 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
     if (_link != '' && _appendToLink == true) {
       return Container(
           decoration: BoxDecoration(
-            color: _backgroundColor,
-          ),
+              color: _backgroundColor,
+              ),
           child: Padding(
               padding: EdgeInsets.all(5.0),
-              child: InkWell(
+              child: _isLink == true
+                  ? InkWell(
                   child: Text(_link,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
                       style: TextStyle(color: _textColor)),
-                  onTap: () => _launchURL(_link))));
+                  onTap: () => _launchURL(_link))
+                  : Text(_link,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                  style: TextStyle(color: _textColor))));
     } else {
       return Container(width: 0, height: 0);
     }
