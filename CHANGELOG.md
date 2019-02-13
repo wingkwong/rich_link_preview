@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.3 
+- Fixed memory leak & failure of displaying widget after setting state issue
+- Reset the link value for appendToLink is false only
+
 ## 0.1.2
 - Resolved wrong package deployed on Pub
 

@@ -13,22 +13,25 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
   Color _backgroundColor;
   Color _textColor;
   bool _appendToLink;
+  bool _isLink;
   Map _ogData;
 
   void getOGData() async {
     Map data = await OpenGraphParser.getOpenGraphData(_link);
     if (data != null) {
-      setState(() {
-        _ogData = data;
-      });
+      if (this.mounted) {
+        setState(() {
+          _ogData = data;
+        });
 
-      controller = AnimationController(
-          vsync: this, duration: Duration(milliseconds: 750));
-      position = Tween<Offset>(begin: Offset(0.0, 4.0), end: Offset.zero)
-          .animate(
-              CurvedAnimation(parent: controller, curve: Curves.bounceInOut));
+        controller = AnimationController(
+            vsync: this, duration: Duration(milliseconds: 750));
+        position = Tween<Offset>(begin: Offset(0.0, 4.0), end: Offset.zero)
+            .animate(
+                CurvedAnimation(parent: controller, curve: Curves.bounceInOut));
 
-      controller.forward();
+        controller.forward();
+      }
     } else {
       setState(() {
         _ogData = null;
@@ -49,6 +52,11 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
     super.initState();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   bool isValidUrl(link) {
     String regexSource =
         "^(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
@@ -65,20 +73,26 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
   @override
   void didUpdateWidget(RichLinkPreview oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (this.mounted && _appendToLink == false) {
+      setState(() {
+        _link = oldWidget.link != widget.link ? widget.link : '';
+      });
+    }
 
-    setState(() {
-      _link = oldWidget.link != widget.link ? widget.link : '';
-    });
     _fetchData();
   }
 
   void _fetchData() {
     if (isValidUrl(_link) == true) {
       getOGData();
+      _isLink = true;
     } else {
-      setState(() {
-        _ogData = null;
-      });
+      if (this.mounted) {
+        setState(() {
+          _ogData = null;
+        });
+      }
+      _isLink = false;
     }
   }
 
@@ -208,12 +222,17 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
           ),
           child: Padding(
               padding: EdgeInsets.all(5.0),
-              child: InkWell(
-                  child: Text(_link,
+              child: _isLink == true
+                  ? InkWell(
+                      child: Text(_link,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                          style: TextStyle(color: _textColor)),
+                      onTap: () => _launchURL(_link))
+                  : Text(_link,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
-                      style: TextStyle(color: _textColor)),
-                  onTap: () => _launchURL(_link))));
+                      style: TextStyle(color: _textColor))));
     } else {
       return Container(width: 0, height: 0);
     }
