@@ -15,15 +15,6 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
   bool _appendToLink;
   bool _isLink;
   Map _ogData;
-  Widget _richLinkPreview;
-
-  Widget buildRichLinkPreviewWidget(BuildContext context) {
-    if(_richLinkPreview == null) {
-      _richLinkPreview = buildRichLinkPreview(context);
-    }
-
-    return _richLinkPreview;
-  }
 
   void getOGData() async {
     Map data = await OpenGraphParser.getOpenGraphData(_link);
@@ -82,11 +73,12 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
   @override
   void didUpdateWidget(RichLinkPreview oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if(this.mounted) {
+    if(this.mounted && _appendToLink == false) {
       setState(() {
         _link = oldWidget.link != widget.link ? widget.link : '';
       });
     }
+
     _fetchData();
   }
 
