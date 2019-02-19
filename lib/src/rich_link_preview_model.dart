@@ -14,6 +14,7 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
   Color _textColor;
   bool _appendToLink;
   bool _isLink;
+  bool _launchFromLink;
   Map _ogData;
 
   void getOGData() async {
@@ -47,6 +48,7 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
     _textColor = widget.textColor ?? Color(0xFF000000);
     _backgroundColor = widget.backgroundColor ?? Color(0xFFE0E0E0);
     _appendToLink = widget.appendToLink ?? false;
+    _launchFromLink = widget.launchFromLink ?? true;
 
     _fetchData();
     super.initState();
@@ -113,7 +115,7 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
           ]);
     } else {
       if (_appendToLink == true) {
-        return _buildPreviewRow(context);
+        return _buildWrappedInkWell(_buildPreviewRow(context));
       } else {
         return (SlideTransition(
             position: position,
@@ -197,7 +199,7 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
             style: TextStyle(fontWeight: FontWeight.bold, color: _textColor),
           ));
     } else {
-      return Container(width: 0, height: 0);
+      return Container(width: 0.0, height: 0.0);
     }
   }
 
@@ -210,7 +212,7 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
               maxLines: 3,
               style: TextStyle(color: _textColor)));
     } else {
-      return Container(width: 0, height: 0);
+      return Container(width: 0.0, height: 0.0);
     }
   }
 
@@ -222,19 +224,22 @@ abstract class RichLinkPreviewModel extends State<RichLinkPreview>
           ),
           child: Padding(
               padding: EdgeInsets.all(5.0),
-              child: _isLink == true
-                  ? InkWell(
-                      child: Text(_link,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                          style: TextStyle(color: _textColor)),
-                      onTap: () => _launchURL(_link))
-                  : Text(_link,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                      style: TextStyle(color: _textColor))));
+              child: new Text(_link,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                  style: TextStyle(color: _textColor))));
     } else {
-      return Container(width: 0, height: 0);
+      return Container(width: 0.0, height: 0.0);
     }
+  }
+
+  Widget _buildWrappedInkWell(Widget widget) {
+    if (_launchFromLink == true &&
+        _link != '' &&
+        _isLink == true &&
+        _appendToLink == true) {
+      return InkWell(child: widget, onTap: () => _launchURL(_link));
+    }
+    return widget;
   }
 }

@@ -44,10 +44,10 @@ class _RichLinkPreviewExampleState extends State<RichLinkPreviewExample> {
                 children: <Widget>[
                   Expanded(
                       child: RichLinkPreview(
-                    link:
-                        'https://ourland.hk/detail/72e1aeaf-360b-4f45-a528-ef1c5e4d803c',
-                    appendToLink: true,
-                  )),
+                          link:
+                              'https://ourland.hk/detail/72e1aeaf-360b-4f45-a528-ef1c5e4d803c',
+                          appendToLink: true,
+                          launchFromLink: true)),
                   RichLinkPreview(
                       link: _link,
                       borderColor: Color(0xFFE0E0E0),
